@@ -3,7 +3,9 @@
          '[reagent.dom :as rdom]
          '[clojure.string :as str])
 
-(def logs? false)
+(def logs? true)
+(def minute 60000)
+(def update-interval (* 5 minute))
 
 (def log (fn [& args] (when logs? (apply js/console.log args))))
 
@@ -73,12 +75,12 @@
    [:p {:className "text-4xl"} (:timeFrom event) " - " (:timeTo event)]
    [:p {:className "text-8xl font-bold"} (random-greeting)]
    [:p {:className "text-8xl font-bold mb-4"} "Baby should " (:should event) " but may " (:may event) "."]
-   [:p {:className "text-4xl"} "Schedule is not set in stone, but this is a good guide."]])
+   [:p {:className "text-4xl"} "Schedule is not set in stone, it is just a guide."]])
 
 (defn app []
   (r/create-class
    {:component-did-mount
-    (fn [] (js/setInterval update-schedule 1000))
+    (fn [] (js/setInterval update-schedule update-interval))
 
     :component-will-unmount
     (fn [this]
