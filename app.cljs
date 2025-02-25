@@ -3,6 +3,10 @@
          '[reagent.dom :as rdom]
          '[clojure.string :as str])
 
+(def logs? false)
+
+(def log (fn [& args] (when logs? (apply js/console.log args))))
+
 (defn schedule-data [] [{:should "play" :may "nurse" :timeFrom "07:00" :timeTo "08:00"}
                         {:should "nurse" :may "play" :timeFrom "09:00" :timeTo "09:30"}
                         {:should "nap" :may "play" :timeFrom "09:30" :timeTo "10:00"}
@@ -36,11 +40,11 @@
           (filter (fn [{:keys [timeFrom timeTo]}]
                     (let [from-time (parse-time timeFrom)
                           to-time (parse-time timeTo)]
-                      (js/console.log "Checking time range:" timeFrom "-" timeTo)  ; Debug log
-                      (js/console.log "Current time in" timezone ":"
-                                      (.toLocaleTimeString tz-now "en-US"
-                                                           #js {:timeZone timezone
-                                                                :hour12 false}))   ; Debug log
+                      (log "Checking time range:" timeFrom "-" timeTo)  ; Debug log
+                      (log "Current time in" timezone ":"
+                           (.toLocaleTimeString tz-now "en-US"
+                                                #js {:timeZone timezone
+                                                     :hour12 false}))   ; Debug log
                       (let [is-overnight? (> (:hours from-time) (:hours to-time))
                             current-total-mins (+ (* current-time 60) current-mins)
                             from-total-mins (+ (* (:hours from-time) 60) (:minutes from-time))
