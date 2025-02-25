@@ -70,12 +70,20 @@
     (when (not= @current-schedule selected)
       (reset! current-schedule selected))))
 
+(defn make-sentence [event] (str "Baby should " (:should event) " but may " (:may event) "."))
+(defn make-time [event] (str (:timeFrom event) " - " (:timeTo event)))
+
 (defn schedule-display [event]
   [:div {:className "text-white"}
-   [:p {:className "text-4xl"} (:timeFrom event) " - " (:timeTo event)]
+   [:p {:className "text-4xl"} (make-time event)]
    [:p {:className "text-8xl font-bold"} (random-greeting)]
-   [:p {:className "text-8xl font-bold mb-4"} "Baby should " (:should event) " but may " (:may event) "."]
-   [:p {:className "text-4xl"} "Schedule is not set in stone, it is just a guide."]])
+   [:p {:className "text-8xl font-bold mb-4"} (make-sentence event)]])
+
+(defn schedule-upcoming-display [event]
+  [:div
+   [:p {:className "text-white text-4xl"} "Next event: "]
+   [:p {:className "text-white text-4xl"} (make-time event)]
+   [:p {:className "text-white text-4xl"} (make-sentence event)]])
 
 (defn app []
   (r/create-class
@@ -89,8 +97,15 @@
 
     :reagent-render
     (fn []
-      [:div {:className "w-full h-[100vh] flex justify-start items-center p-8 bg-teal-600"}
-       [schedule-display (or @current-schedule (schedule-select (schedule-data)))]])}))
+      [:div {:className "w-full h-[100vh] flex flex-col justify-start items-start p-8 bg-black"}
+       [schedule-display (or @current-schedule (schedule-select (schedule-data)))]
+       (let [next-schedule (r/atom nil)
+             _ (reset! next-schedule 
+                 (let [all-events (schedule-data)
+                       current-idx (.indexOf all-events (or @current-schedule (schedule-select all-events)))
+                       next-idx (mod (inc current-idx) (count all-events))]
+                   (get all-events next-idx)))]
+         [schedule-upcoming-display @next-schedule])])}))
 
 (defn root []
   [app])
