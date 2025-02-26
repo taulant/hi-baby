@@ -4,10 +4,11 @@
          '[clojure.string :as str])
 
 (def logs? true)
+(def log (fn [& args] (when logs? (apply js/console.log args))))
+
 (def minute 60000)
 (def update-interval (* 5 minute))
-
-(def log (fn [& args] (when logs? (apply js/console.log args))))
+(def bg-colors ["bg-slate-500" "bg-slate-600" "bg-slate-700" "bg-slate-800" "bg-slate-900" "bg-black"])
 
 (defn schedule-data [] [{:should "play" :may "nurse" :timeFrom "07:00" :timeTo "08:00"}
                         {:should "nurse" :may "play" :timeFrom "09:00" :timeTo "09:30"}
@@ -20,6 +21,7 @@
                         {:should "get pre-sleep bath" :may "want to play with a rubber ducky" :timeFrom "18:00" :timeTo "18:30"}
                         {:should "get ready for bed" :may "just want to snuggle" :timeFrom "18:30" :timeTo "19:00"}
                         {:should "be asleep" :may "need to be soothed back to sleep" :timeFrom "19:00" :timeTo "07:00"}])
+
 
 (defn random-greeting []
   (let [greetings ["Hi there!" "Hello there!" "Hey there!" "Greetings!" "Howdy!"]]
@@ -97,15 +99,16 @@
 
     :reagent-render
     (fn []
-      [:div {:className "w-full h-[100vh] flex flex-col justify-start items-start p-8 bg-black"}
-       [schedule-display (or @current-schedule (schedule-select (schedule-data)))]
-       (let [next-schedule (r/atom nil)
-             _ (reset! next-schedule 
-                 (let [all-events (schedule-data)
-                       current-idx (.indexOf all-events (or @current-schedule (schedule-select all-events)))
-                       next-idx (mod (inc current-idx) (count all-events))]
-                   (get all-events next-idx)))]
-         [schedule-upcoming-display @next-schedule])])}))
+      [:div {:className "w-full h-[100vh] flex justify-center items-center p-8 bg-slate-600"}
+       [:div {:className (str "flex flex-col justify-start items-start")}
+        [schedule-display (or @current-schedule (schedule-select (schedule-data)))]
+        (let [next-schedule (r/atom nil)
+              _ (reset! next-schedule
+                        (let [all-events (schedule-data)
+                              current-idx (.indexOf all-events (or @current-schedule (schedule-select all-events)))
+                              next-idx (mod (inc current-idx) (count all-events))]
+                          (get all-events next-idx)))]
+          [schedule-upcoming-display @next-schedule])]])}))
 
 (defn root []
   [app])
