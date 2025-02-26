@@ -99,7 +99,7 @@
 
     :reagent-render
     (fn []
-      [:div {:className "w-full h-[100vh] flex justify-center items-center p-8 bg-slate-600"}
+      [:div {:className "w-full h-[100vh] flex justify-center items-center p-8 bg-black"}
        [:div {:className (str "flex flex-col justify-start items-start")}
         [schedule-display (or @current-schedule (schedule-select (schedule-data)))]
         (let [next-schedule (r/atom nil)
